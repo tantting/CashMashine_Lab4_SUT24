@@ -4,9 +4,9 @@ class Program
 {
     static void Main(string[] args)
     {
-    //Initiate a multi dim array for storing user nr, id(personal nummber) and passsword of the five customers
+        //Initiate a multi dim array for storing user nr, id(personal nummber) and passsword of the five customers
         //need to be of type long to store the personal numbers
-        long[,] customers = { {1, 8203053536, 5435}, {2, 6412235334, 6334}, {3, 9704304647, 2674}, 
+        long[,] customers = { {1, 8204084647, 1234}, {2, 6412235334, 6334}, {3, 9704304647, 2674}, 
             {4, 5901174536, 8512}, {5, 9310224650, 1452} };
         //An array of arrays is declared for storing variables for type double. Intended for storing bank
         //accounts later on. It will store bank accounts for 5 users. 
@@ -41,45 +41,65 @@ class Program
     public static long LogIn(long[,] customer)
     {
         //need variable to store the user input
+
+        int indexRowCustomer = 0;
+        bool matchingLogin = false; 
+
+        while (!matchingLogin)
+        { 
         
-        long personalNr;
-        bool correctPersNr = false;
-
-        do
-        {
-            Console.Clear();
-            Console.Write("Ange ditt personnummer (YYMMDDXXXX): ");
-            string inputPersNr = Console.ReadLine();
-            if ((inputPersNr.Length == 10) && (Int64.TryParse(inputPersNr, out personalNr)))
+            long personNr = 0;
+            bool correctPersNr = false;
+        
+            do
             {
-                correctPersNr = true;
-            }
-            else
+                Console.Clear();
+                Console.Write("Ange ditt personnummer (YYMMDDXXXX): ");
+                string inputPersNr = Console.ReadLine();
+                if ((inputPersNr.Length == 10) && (Int64.TryParse(inputPersNr, out personNr)))
+                {
+                    correctPersNr = true;
+                }
+                else
+                {
+                    Console.WriteLine("Felaktig inmatning!\n\nTryck valfri tangent för att försöka igen");
+                    Console.ReadKey();
+                }
+            } while (!correctPersNr);
+
+            int password = 0;
+            bool correctPassword = false;
+
+            do
             {
-                Console.WriteLine("Felaktig inmatning!\n\nTryck valfri tangent för att försöka igen");
-                Console.ReadKey();
-            }
-        } while (!correctPersNr);
-
-        int password = 0;
-        bool correctPassword = false;
-
-        do
-        {
-            Console.Clear();
-            Console.Write("Ange ditt lösenord, 4 siffror: ");
-            string inputPassword = Console.ReadLine();
-            if ((inputPassword.Length == 4) && Int32.TryParse(inputPassword, out password))
+                Console.Clear();
+                Console.Write("Ange ditt lösenord, 4 siffror: ");
+                string inputPassword = Console.ReadLine();
+                if ((inputPassword.Length == 4) && Int32.TryParse(inputPassword, out password))
+                {
+                    correctPassword = true;
+                }
+                else
+                {
+                    Console.WriteLine("Felaktig inmatning!\n\nTryck valfri tangent för att försöka igen");
+                    Console.ReadKey();
+                }
+            } while (!correctPassword);
+        
+            for (int i = 0; i < customer.GetLength(0); i++)
             {
-                correctPassword = true;
+                if (personNr == customer[i, 1] && password == customer[i, 2])
+                {
+                    indexRowCustomer = i;
+                    Console.WriteLine("Välkommen in!");
+                    matchingLogin = true;
+                }
+                else
+                {
+                    Console.WriteLine("Ditt personnummer och lösenord matchar inte! Försök igen!");
+                }
             }
-            else
-            {
-                Console.WriteLine("Felaktig inmatning!\n\nTryck valfri tangent för att försöka igen");
-                Console.ReadKey();
-            }
-        } while (!correctPassword);
-
-
+        }
+        return indexRowCustomer;
     }
 }
