@@ -43,9 +43,11 @@ class Program
         //need variable to store the user input
 
         int indexRowCustomer = 0;
-        bool matchingLogin = false; 
+        bool runningMenu = true;
+        bool matchingLogin = false;
+        int numberTried = 0;
 
-        while (!matchingLogin)
+        while (runningMenu)
         { 
         
             long personNr = 0;
@@ -67,7 +69,7 @@ class Program
                 }
             } while (!correctPersNr);
 
-            int password = 0;
+            long password = 0;
             bool correctPassword = false;
 
             do
@@ -75,7 +77,7 @@ class Program
                 Console.Clear();
                 Console.Write("Ange ditt lösenord, 4 siffror: ");
                 string inputPassword = Console.ReadLine();
-                if ((inputPassword.Length == 4) && Int32.TryParse(inputPassword, out password))
+                if ((inputPassword.Length == 4) && Int64.TryParse(inputPassword, out password))
                 {
                     correctPassword = true;
                 }
@@ -85,19 +87,23 @@ class Program
                     Console.ReadKey();
                 }
             } while (!correctPassword);
-        
+            
             for (int i = 0; i < customer.GetLength(0); i++)
             {
-                if (personNr == customer[i, 1] && password == customer[i, 2])
+                if ((personNr == customer[i, 1]) && (password == customer[i, 2]))
                 {
                     indexRowCustomer = i;
                     Console.WriteLine("Välkommen in!");
                     matchingLogin = true;
+                    runningMenu = false;
+                    break;
                 }
-                else
-                {
-                    Console.WriteLine("Ditt personnummer och lösenord matchar inte! Försök igen!");
-                }
+            }
+            numberTried++;
+            if (numberTried == 3)
+            {
+                Console.WriteLine("Du har dessvärre förbrukat dina 3 chanser att logga in!");
+                runningMenu = false;
             }
         }
         return indexRowCustomer;
