@@ -15,7 +15,14 @@ class Program
             {4, 5901174536, 8512}, {5, 9310224650, 1452} };
         //An array of arrays is declared for storing variables for type double. Intended for storing bank
         //accounts later on. It will store bank accounts for 5 users. 
-        double[][] bankAccounts = new double [5][];
+        double[,,] bankAccounts = new double [customers.GetLength(0), 20, 2];
+
+        for (int i = 0; i < customers.GetLength(0); i++)
+        {
+            bankAccounts[i, 0, 0] = customers[i, 1];
+            Console.WriteLine(bankAccounts[i, 0, 0]);
+        }
+        
         
         bool runApp = true;
         while (runApp)
@@ -131,7 +138,11 @@ class MyMethods
     }
     
     //====================================================METHOD========================================================
-
+    /// <summary>
+    /// A menthod for running the head menu of user options once logged in. 
+    /// </summary>
+    /// <param name="indexRowCustomer"></param>
+    /// <returns></returns>
     public static bool HeadMenu(int indexRowCustomer)
     {
         bool runMenu = true;
@@ -172,5 +183,12 @@ class MyMethods
         }
 
         return runMenu;
+    }
+    
+    //====================================================METHOD========================================================
+
+    public static void AccountsAndBalance()
+    {
+        
     }
 }
