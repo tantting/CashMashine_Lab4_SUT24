@@ -9,13 +9,31 @@ class Program
 {
     static void Main(string[] args)
     {
+        int customerIndex; 
         //Initiate a multi dim array for storing user nr, id(personal nummber) and passsword of the five customers
         //need to be of type long to store the personal numbers
         long[,] customers = { {1, 8204084647, 1234}, {2, 6412235334, 6334}, {3, 9704304647, 2674}, 
             {4, 5901174536, 8512}, {5, 9310224650, 1452} };
         //An array of arrays is declared for storing variables for type double. Intended for storing bank
         //accounts later on. It will store bank accounts for 5 users. 
-        double[][] bankAccounts = new double [5][];
+        double[,,] bankAccounts = new double [customers.GetLength(0), 11, 2];
+        
+
+        for (int i = 0; i < customers.GetLength(0); i++)
+        {
+            for (int j = 0; j < bankAccounts.GetLength(1); j++)
+            {
+                bankAccounts[i, 0, 0] = customers[i, 1];
+                
+                if (j > 0)
+                {
+                    bankAccounts[i, j, 0] = j;
+                }
+                //Console.Write($"konto: {bankAccounts[i, j, 0]},   ");
+            }
+            //Console.WriteLine();
+        }
+        
         
         bool runApp = true;
         while (runApp)
@@ -27,8 +45,8 @@ class Program
             switch (Console.ReadLine())
             {
                 case "1":
-                    int customerIndex = MyMethods.LogIn(customers);
-                    bool stayLoggedIn = MyMethods.HeadMenu(customerIndex);
+                    customerIndex = MyMethods.LogIn(customers);
+                    bool stayLoggedIn = MyMethods.HeadMenu(customerIndex, bankAccounts);
                     break;
                 case "2":
                     Console.WriteLine("Välkommen åter!");
@@ -53,7 +71,8 @@ class MyMethods
     /// </summary>
     public static int LogIn(long[,] customer)
     {
-        int indexRowCustomer = 0;
+        //need a variable that can hold and return the personalnumber if login succeed. 
+        int customerIndex = 0; 
         bool runLogin = true;
         bool matchLogin = false;
         int numberTried = 0;
@@ -103,8 +122,8 @@ class MyMethods
             {
                 if ((personNr == customer[i, 1]) && (password == customer[i, 2]))
                 {
-                    indexRowCustomer = i;
                     matchLogin = true;
+                    return customerIndex;
                     runLogin = false;
                     break;
                 }
@@ -127,12 +146,16 @@ class MyMethods
                 runLogin = false;
             }
         }
-        return indexRowCustomer;
+        return 0;
     }
     
     //====================================================METHOD========================================================
-
-    public static bool HeadMenu(int indexRowCustomer)
+    /// <summary>
+    /// A menthod for running the head menu of user options once logged in. 
+    /// </summary>
+    /// <param name="indexRowCustomer"></param>
+    /// <returns></returns>
+    public static bool HeadMenu(int customerIndex, double[,,] bankAccounts)
     {
         bool runMenu = true;
 
@@ -145,9 +168,9 @@ class MyMethods
                               "\n3. Ta ut Pengar" +
                               "\n4. Logga ut");
 
-            bool testInput = Int32.TryParse(Console.ReadLine(), out int userChoice);
+            int userChoice = 0;
 
-            while (!testInput)
+            while (!Int32.TryParse(Console.ReadLine(), out userChoice))
             {
                 Console.WriteLine("Felaktig input! Försök igen!");
             }
@@ -156,6 +179,7 @@ class MyMethods
             {
                 case 1:
                     Console.WriteLine("Se över konton och saldon");
+                    AccountsAndBalance(customerIndex, bankAccounts);
                     break;
                 case 2:
                     Console.WriteLine("Överföring mellan konton");
@@ -166,11 +190,31 @@ class MyMethods
                 case 4:
                     Console.Clear();
                     Console.WriteLine("Tack för denna gång! Ha en trevlig dag!\n");
-                    runMenu = false; 
+                    runMenu = false;
+                    break;
+                default:
+                    Console.WriteLine("Du måste ange en siffra mellan 1 och 4! Tryck på valfri tangent för att " +
+                                      "försöka igen!");
                     break;
             }
+
+            Console.ReadKey();
+        }
+        return runMenu;
+    }
+    
+    //====================================================METHOD========================================================
+
+    public static void AccountsAndBalance(int customerIndex, double[,,] bankAccounts)
+    {
+        Console.WriteLine("Du har följande aktiva konton:");
+        
+        //set i start at 1 since the personalnumber is on index 0, and i now want the accounts
+        for (int i = 1; i < bankAccounts.GetLength(1); i++)
+        {
+            Console.WriteLine($"konto nr {i}.        saldo: {bankAccounts[customerIndex, i, 0]}");
         }
 
-        return runMenu;
+        Console.ReadKey();
     }
 }
