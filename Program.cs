@@ -46,7 +46,16 @@ class Program
             {
                 case "1":
                     customerIndex = MyMethods.LogIn(customers);
-                    bool stayLoggedIn = MyMethods.HeadMenu(customerIndex, bankAccounts);
+                    //if customerIndex is -1, the user has not been able to login. 
+                    if (customerIndex == -1)
+                    {
+                        
+                        runApp = false;
+                    }
+                    else
+                    {
+                        bool stayLoggedIn = MyMethods.HeadMenu(customerIndex, bankAccounts);
+                    }
                     break;
                 case "2":
                     Console.WriteLine("Välkommen åter!");
@@ -122,8 +131,7 @@ class MyMethods
             {
                 if ((personNr == customer[i, 1]) && (password == customer[i, 2]))
                 {
-                    matchLogin = true;
-                    return customerIndex;
+                    customerIndex = i;
                     runLogin = false;
                     break;
                 }
@@ -140,13 +148,14 @@ class MyMethods
             if (numberTried == 3)
             {
                 Console.Clear();
-                Console.WriteLine("\nDu har dessvärre förbrukat dina 3 chanser att logga in!");
-                Console.WriteLine("\nTryck valfri tangent för att komma vidare!");
-                Console.ReadKey();
+                Console.WriteLine("Du har dessvärre förbrukat dina 3 chanser att logga in!" +
+                                  "\n\nDu behöver starta om din internetbank för att logga in på nytt!" +
+                                  "\n\nHa en fin dag!");
+                customerIndex = -1;
                 runLogin = false;
             }
         }
-        return 0;
+        return customerIndex;
     }
     
     //====================================================METHOD========================================================
