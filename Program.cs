@@ -1,5 +1,7 @@
 ﻿//Jenny-Ann Hayward, SUT24
 
+using System.Globalization;
+
 namespace CashMashine_Lab4_SUT24;
 
 //========================================================CLASS========================================================
@@ -38,7 +40,7 @@ class Program
 
         double[,,]bankAccounts = MyMethods.PopulateBankAccountArray(customers, emptyAccountDatabase, accountNames, 
             startbalances);
-        MyMethods.WriteCustomersAndAccounts(bankAccounts, accountNames);
+        //MyMethods.WriteCustomersAndAccounts(bankAccounts, accountNames);
         
         
         bool runApp = true;
@@ -59,7 +61,7 @@ class Program
                     }
                     else
                     {
-                        bool stayLoggedIn = MyMethods.HeadMenu(customerIndex, bankAccounts);
+                        bool stayLoggedIn = MyMethods.HeadMenu(customerIndex, bankAccounts, accountNames);
                     }
                     break;
                 case "2":
@@ -89,8 +91,8 @@ class MyMethods
     /// <param name="startbalances"></param>
     /// <returns></returns>
 
-    public static double[,,] PopulateBankAccountArray(long[,] customers, double[,,] emptyAccountsArray, string[,] accountNames, 
-        double[] startbalances)
+    public static double[,,] PopulateBankAccountArray(long[,] customers, double[,,] emptyAccountsArray, 
+        string[,] accountNames, double[] startbalances)
     {
         int indexbalance = 0;
         
@@ -118,50 +120,6 @@ class MyMethods
         //return the array populated with data. 
         return emptyAccountsArray; 
     }
-    /*
-    //====================================================METHOD========================================================
-    /// <summary>
-    /// A method for my use - to get a quick overview of customers, balances and accounts statuses. 
-    /// </summary>
-    /// <param name="customers"></param>
-    /// <param name="bankAccounts"></param>
-    /// <param name="accountNames"></param>
-    /// <param name="startbalances"></param>
-    /// <returns></returns>
-    public static double[,,] WriteCustomersAndAccounts(long[,] customers, double[,,] bankAccounts, string[,] 
-            accountNames, double[] startbalances)
-    {
-        int indexbalance = 0;
-        
-        for (int i = 0; i < customers.GetLength(0); i++)
-        {
-            Console.WriteLine($"kund: {i + 1}");
-
-            for (int j = 0; j < bankAccounts.GetLength(1); j++)
-            {
-                //bankAccounts[i, 0, 0] = customers[i, 1];
-
-                if (j > 0 && accountNames[i, j].Length > 0)
-                {
-                    //bankAccounts[i, j, 0] = startbalances[indexbalance];
-                    indexbalance++;
-                    Console.Write($"   {accountNames[i, j]}: {bankAccounts[i, j, 0]} sek");
-                }
-
-                for (int k = 0; k < bankAccounts.GetLength(2); k++)
-                {
-                    if (j != 0 && k != 0 && accountNames[i, j].Length > 0)
-                    {
-                        //bankAccounts[i, j, k] = 1;
-                        Console.Write($"   aktivt(värde 1): {bankAccounts[i, j, k]}");
-                    }
-                }
-            }
-            Console.WriteLine($"\nPersonnummer: {bankAccounts[i, 0, 0]}");
-            Console.WriteLine();
-        }
-        return bankAccounts; 
-    }*/
 
     //====================================================METHOD========================================================
     /// <summary>
@@ -231,7 +189,8 @@ class MyMethods
                 }
                 else
                 {
-                    Console.WriteLine("Felaktigt format på ditt personnummer!\n\nTryck valfri tangent för att försöka igen");
+                    Console.WriteLine("Felaktigt format på ditt personnummer!\n\nTryck valfri tangent för att " +
+                                      "försöka igen");
                     Console.ReadKey();
                 }
             } while (!correctPersNr);
@@ -265,8 +224,8 @@ class MyMethods
                 }
             }
             numberTried++;
-
-            if (!matchLogin)
+            //runLogin true means login did not succeed. Password and personal nr did not match
+            if (runLogin)
             {
                 Console.WriteLine("\nDitt personnummer eller lösenord stämmer inte");
                 Console.WriteLine("\nTryck valfri tangent för att komma vidare!");
@@ -292,7 +251,7 @@ class MyMethods
     /// </summary>
     /// <param name="indexRowCustomer"></param>
     /// <returns></returns>
-    public static bool HeadMenu(int customerIndex, double[,,] bankAccounts)
+    public static bool HeadMenu(int customerIndex, double[,,] bankAccounts, string[,] accountNames)
     {
         bool runMenu = true;
 
@@ -316,7 +275,7 @@ class MyMethods
             {
                 case 1:
                     Console.WriteLine("Se över konton och saldon");
-                    AccountsAndBalance(customerIndex, bankAccounts);
+                    AccountsAndBalance(customerIndex, bankAccounts, accountNames);
                     break;
                 case 2:
                     Console.WriteLine("Överföring mellan konton");
@@ -346,14 +305,20 @@ class MyMethods
     /// </summary>
     /// <param name="customerIndex"></param>
     /// <param name="bankAccounts"></param>
-    public static void AccountsAndBalance(int customerIndex, double[,,] bankAccounts)
+    public static void AccountsAndBalance(int customerIndex, double[,,] bankAccounts, string[,] accountNames)
     {
-        Console.WriteLine("Du har följande aktiva konton:");
+        Console.Clear();
+        Console.WriteLine($"{accountNames[customerIndex, 0]}, du har just nu följande aktiva konton:");
         
         //set i start at 1 since the personalnumber is on index 0, and i now want the accounts
         for (int i = 1; i < bankAccounts.GetLength(1); i++)
         {
-            Console.WriteLine($"konto nr {i}.        saldo: {bankAccounts[customerIndex, i, 0]}");
+            if (accountNames[customerIndex, i].Length != 0)
+            {
+                double balance = bankAccounts[customerIndex, i, 0];  
+                Console.WriteLine($"{accountNames[customerIndex, i]}.        " +
+                                  $"saldo: {balance.ToString("C3", CultureInfo.CurrentCulture)}");
+            }
         }
 
         Console.WriteLine("Klicka enter för att komma till huvudmenyn!");
