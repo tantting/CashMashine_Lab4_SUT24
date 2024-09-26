@@ -40,16 +40,14 @@ class Program
     /// </summary>
     public static long LogIn(long[,] customer)
     {
-        //need variable to store the user input
-
         int indexRowCustomer = 0;
-        bool runningMenu = true;
-        bool matchingLogin = false;
+        bool runLogin = true;
+        bool matchLogin = false;
         int numberTried = 0;
 
-        while (runningMenu)
+        while (runLogin)
         { 
-        
+            //need variable to store the user input
             long personNr = 0;
             bool correctPersNr = false;
         
@@ -94,17 +92,26 @@ class Program
                 {
                     indexRowCustomer = i;
                     Console.WriteLine("Välkommen in!");
-                    matchingLogin = true;
-                    runningMenu = false;
+                    matchLogin = true;
+                    runLogin = false;
+                    Console.ReadKey();
                     break;
                 }
             }
             numberTried++;
+
+            if (!matchLogin)
+            {
+                Console.WriteLine("\nDitt personnummer eller lösenord stämmer inte");
+            }
+
             if (numberTried == 3)
             {
-                Console.WriteLine("Du har dessvärre förbrukat dina 3 chanser att logga in!");
-                runningMenu = false;
+                Console.WriteLine("\nDu har dessvärre förbrukat dina 3 chanser att logga in!");
+                runLogin = false;
             }
+            Console.WriteLine("\nTryck valfri tangent för att komma vidare!");
+            Console.ReadKey();
         }
         return indexRowCustomer;
     }
