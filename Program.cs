@@ -1,5 +1,10 @@
-﻿namespace CashMashine_Lab4_SUT24;
+﻿//Jenny-Ann Hayward, SUT24
 
+namespace CashMashine_Lab4_SUT24;
+
+//========================================================CLASS========================================================
+//A program class with the main method for running the program
+//=====================================================================================================================
 class Program
 {
     static void Main(string[] args)
@@ -22,7 +27,8 @@ class Program
             switch (Console.ReadLine())
             {
                 case "1":
-                    LogIn(customers);
+                    int customerIndex = MyMethods.LogIn(customers);
+                    bool stayLoggedIn = MyMethods.HeadMenu(customerIndex);
                     break;
                 case "2":
                     Console.WriteLine("Välkommen åter!");
@@ -32,13 +38,20 @@ class Program
                     Console.WriteLine("Felaktigt val! Försök igen!");
                     break;
             }
-
         }
     }
+}
+
+//========================================================CLASS=========================================================
+//A class for gathering all the methods for the program
+//======================================================================================================================
+class MyMethods
+{
+    //====================================================METHOD========================================================
     /// <summary>
     /// A method for user login
     /// </summary>
-    public static long LogIn(long[,] customer)
+    public static int LogIn(long[,] customer)
     {
         int indexRowCustomer = 0;
         bool runLogin = true;
@@ -62,7 +75,7 @@ class Program
                 }
                 else
                 {
-                    Console.WriteLine("Felaktig inmatning!\n\nTryck valfri tangent för att försöka igen");
+                    Console.WriteLine("Felaktigt format på ditt personnummer!\n\nTryck valfri tangent för att försöka igen");
                     Console.ReadKey();
                 }
             } while (!correctPersNr);
@@ -81,7 +94,7 @@ class Program
                 }
                 else
                 {
-                    Console.WriteLine("Felaktig inmatning!\n\nTryck valfri tangent för att försöka igen");
+                    Console.WriteLine("Felaktigt format på lösenordet!\n\nTryck valfri tangent för att försöka igen");
                     Console.ReadKey();
                 }
             } while (!correctPassword);
@@ -91,10 +104,8 @@ class Program
                 if ((personNr == customer[i, 1]) && (password == customer[i, 2]))
                 {
                     indexRowCustomer = i;
-                    Console.WriteLine("Välkommen in!");
                     matchLogin = true;
                     runLogin = false;
-                    Console.ReadKey();
                     break;
                 }
             }
@@ -103,16 +114,63 @@ class Program
             if (!matchLogin)
             {
                 Console.WriteLine("\nDitt personnummer eller lösenord stämmer inte");
+                Console.WriteLine("\nTryck valfri tangent för att komma vidare!");
+                Console.ReadKey();
             }
 
             if (numberTried == 3)
             {
+                Console.Clear();
                 Console.WriteLine("\nDu har dessvärre förbrukat dina 3 chanser att logga in!");
+                Console.WriteLine("\nTryck valfri tangent för att komma vidare!");
+                Console.ReadKey();
                 runLogin = false;
             }
-            Console.WriteLine("\nTryck valfri tangent för att komma vidare!");
-            Console.ReadKey();
         }
         return indexRowCustomer;
+    }
+    
+    //====================================================METHOD========================================================
+
+    public static bool HeadMenu(int indexRowCustomer)
+    {
+        bool runMenu = true;
+
+        while (runMenu)
+        {
+            Console.Clear();
+            Console.WriteLine("Vad vill du göra?" +
+                              "\n1. Se över konton och saldo" +
+                              "\n2. Överföring mellan konton" +
+                              "\n3. Ta ut Pengar" +
+                              "\n4. Logga ut");
+
+            bool testInput = Int32.TryParse(Console.ReadLine(), out int userChoice);
+
+            while (!testInput)
+            {
+                Console.WriteLine("Felaktig input! Försök igen!");
+            }
+
+            switch (userChoice)
+            {
+                case 1:
+                    Console.WriteLine("Se över konton och saldon");
+                    break;
+                case 2:
+                    Console.WriteLine("Överföring mellan konton");
+                    break;
+                case 3:
+                    Console.WriteLine("Ta ut Pengar");
+                    break;
+                case 4:
+                    Console.Clear();
+                    Console.WriteLine("Tack för denna gång! Ha en trevlig dag!\n");
+                    runMenu = false; 
+                    break;
+            }
+        }
+
+        return runMenu;
     }
 }
