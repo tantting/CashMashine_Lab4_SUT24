@@ -9,30 +9,35 @@ class Program
 {
     static void Main(string[] args)
     {
-        int customerIndex; 
+        int customerIndex;
         //Initiate a multi dim array for storing user nr, id(personal nummber) and passsword of the five customers
         //need to be of type long to store the personal numbers
-        long[,] customers = { {1, 8204084647, 1234}, {2, 6412235334, 6334}, {3, 9704304647, 2674}, 
-            {4, 5901174536, 8512}, {5, 9310224650, 1452} };
+        long[,] customers =
+        {
+            { 1, 8204084647, 1234 }, { 2, 6412235334, 6334 }, { 3, 9704304647, 2674 },
+            { 4, 5901174536, 8512 }, { 5, 9310224650, 1452 }
+        };
         //An array of arrays is declared for storing variables for type double. Intended for storing bank
         //accounts later on. It will store bank accounts for 5 users. 
-        double[,,] bankAccounts = new double [customers.GetLength(0), 11, 2];
-        
-
-        for (int i = 0; i < customers.GetLength(0); i++)
+        double[,,] emptyAccountDatabase = new double [customers.GetLength(0), 11, 2];
+        //An array of account names. 
+        string[,] accountNames =
         {
-            for (int j = 0; j < bankAccounts.GetLength(1); j++)
-            {
-                bankAccounts[i, 0, 0] = customers[i, 1];
-                
-                if (j > 0)
-                {
-                    bankAccounts[i, j, 0] = j;
-                }
-                //Console.Write($"konto: {bankAccounts[i, j, 0]},   ");
-            }
-            //Console.WriteLine();
-        }
+            { "Lönekonto", "buffer", "pension", "", "", "", "", "", "", "" },
+            { "Lönekonto", "", "", "", "", "", "", "", "", "" },
+            { "Lönekonto", "pension", "", "", "", "", "", "", "", "" },
+            { "Lönekonto", "semesterspar", "bröllop", "pension", "", "", "", "", "", "" },
+            { "Lönekonto", "spar", "syjuntan", "sparTillBarnen", "", "", "", "", "", "" }
+        };
+
+        //
+        double[] startbalances =
+        {
+            27030, 89232, 170212, 41621, 22011, 43000, 51000, 11232, 36021, 12421, 29432, 42819, 8359, 23451
+        };
+
+        double[,,]bankAccounts = MyMethods.PopulateBankAccountArray(customers, emptyAccountDatabase, accountNames, 
+            startbalances);
         
         
         bool runApp = true;
@@ -49,7 +54,6 @@ class Program
                     //if customerIndex is -1, the user has not been able to login. 
                     if (customerIndex == -1)
                     {
-                        
                         runApp = false;
                     }
                     else
@@ -74,6 +78,94 @@ class Program
 //======================================================================================================================
 class MyMethods
 {
+    //====================================================METHOD========================================================
+    /// <summary>
+    /// A method for setting the starting data for the accounts at start of program
+    /// </summary>
+    /// <param name="customers"></param>
+    /// <param name="bankAccounts"></param>
+    /// <param name="accountNames"></param>
+    /// <param name="startbalances"></param>
+    /// <returns></returns>
+
+    public static double[,,] PopulateBankAccountArray(long[,] customers, double[,,] bankAccounts, string[,] accountNames, 
+        double[] startbalances)
+    {
+        int indexbalance = 0;
+        
+        for (int i = 0; i < customers.GetLength(0); i++)
+        {
+            //Console.WriteLine($"kund: {i + 1}");
+
+            for (int j = 0; j < bankAccounts.GetLength(1); j++)
+            {
+                bankAccounts[i, 0, 0] = customers[i, 1];
+
+                if (j > 0 && accountNames[i, j - 1].Length > 0)
+                {
+                    bankAccounts[i, j, 0] = startbalances[indexbalance];
+                    indexbalance++;
+                    //Console.Write($"   {accountNames[i, j - 1]}: {bankAccounts[i, j, 0]} sek");
+                }
+
+                for (int k = 0; k < bankAccounts.GetLength(2); k++)
+                {
+                    if (j != 0 && k != 0 && accountNames[i, j-1].Length > 0)
+                    {
+                        bankAccounts[i, j, k] = 1;
+                      //  Console.Write($"   Status: {bankAccounts[i, j, k]}");
+                    }
+                }
+            }
+            //Console.WriteLine($"\nPersonnummer: {bankAccounts[i, 0, 0]}");
+            //Console.WriteLine();
+        }
+
+        return bankAccounts; 
+    }
+    //====================================================METHOD========================================================
+    /// <summary>
+    /// A method for my use - to get a quick overview of customers, balances and accounts statuses. 
+    /// </summary>
+    /// <param name="customers"></param>
+    /// <param name="bankAccounts"></param>
+    /// <param name="accountNames"></param>
+    /// <param name="startbalances"></param>
+    /// <returns></returns>
+    public static double[,,] WriteCustomersAndAccounts(long[,] customers, double[,,] bankAccounts, string[,] 
+            accountNames, double[] startbalances)
+    {
+        int indexbalance = 0;
+        
+        for (int i = 0; i < customers.GetLength(0); i++)
+        {
+            Console.WriteLine($"kund: {i + 1}");
+
+            for (int j = 0; j < bankAccounts.GetLength(1); j++)
+            {
+                bankAccounts[i, 0, 0] = customers[i, 1];
+
+                if (j > 0 && accountNames[i, j - 1].Length > 0)
+                {
+                    bankAccounts[i, j, 0] = startbalances[indexbalance];
+                    indexbalance++;
+                    Console.Write($"   {accountNames[i, j - 1]}: {bankAccounts[i, j, 0]} sek");
+                }
+
+                for (int k = 0; k < bankAccounts.GetLength(2); k++)
+                {
+                    if (j != 0 && k != 0 && accountNames[i, j-1].Length > 0)
+                    {
+                        bankAccounts[i, j, k] = 1;
+                        Console.Write($"   Status: {bankAccounts[i, j, k]}");
+                    }
+                }
+            }
+            Console.WriteLine($"\nPersonnummer: {bankAccounts[i, 0, 0]}");
+            Console.WriteLine();
+        }
+        return bankAccounts; 
+    }
     //====================================================METHOD========================================================
     /// <summary>
     /// A method for user login
@@ -213,7 +305,11 @@ class MyMethods
     }
     
     //====================================================METHOD========================================================
-
+    /// <summary>
+    /// Writing the accounts and balances 
+    /// </summary>
+    /// <param name="customerIndex"></param>
+    /// <param name="bankAccounts"></param>
     public static void AccountsAndBalance(int customerIndex, double[,,] bankAccounts)
     {
         Console.WriteLine("Du har följande aktiva konton:");
@@ -224,6 +320,7 @@ class MyMethods
             Console.WriteLine($"konto nr {i}.        saldo: {bankAccounts[customerIndex, i, 0]}");
         }
 
+        Console.WriteLine("Klicka enter för att komma till huvudmenyn!");
         Console.ReadKey();
     }
 }
