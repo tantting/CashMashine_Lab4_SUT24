@@ -284,11 +284,12 @@ class MyMethods
                 case 2:
                     Console.WriteLine("ÖVERFÖRING");
                     Console.WriteLine("-------------------------------");
-                    bankAccounts = MyMethods.MoneyTransfer(customerIndex, bankAccounts, accountNames);
+                    bankAccounts = MoneyTransfer(customerIndex, bankAccounts, accountNames);
                     break;
                 case 3:
                     Console.WriteLine("UTTAG");
                     Console.WriteLine("-------------------------------");
+                    bankAccounts = MoneyWithraw(customerIndex, bankAccounts, accountNames);
                     break;
                 case 4:
                     Console.Clear();
@@ -298,10 +299,9 @@ class MyMethods
                 default:
                     Console.WriteLine("Du måste ange en siffra mellan 1 och 4! Tryck på valfri tangent för att " +
                                       "försöka igen!");
+                    Console.ReadKey();
                     break;
             }
-
-            Console.ReadKey();
         }
         return runMenu;
     }
@@ -407,7 +407,8 @@ class MyMethods
                 Console.Clear();
             }
         }
-        double amountTransfer = AmountToHandle(bankAccounts, customerIndex, accountNames, accountIndexFrom);
+        double amountTransfer = AmountToHandle(bankAccounts, customerIndex, accountNames, accountIndexFrom, 
+            "föra över");
 
         bankAccounts[customerIndex, accountIndexFrom, 0] -= amountTransfer;
         bankAccounts[customerIndex, accountIndexTo, 0] += amountTransfer;
@@ -421,13 +422,14 @@ class MyMethods
                               "C3", CultureInfo.CurrentCulture)}) >");
         
         Console.WriteLine("\nTryck enter för att fortsätta");
+        Console.ReadKey();
         return bankAccounts;
     }
     
     //====================================================METHOD========================================================
     
     public static double AmountToHandle(double[,,] bankAccounts, int customerIndex,  string[,] accountNames, 
-    int accountIndexFrom)
+        int accountIndexFrom, string action)
     {
         double amountToHandle = 0;
 
@@ -440,7 +442,7 @@ class MyMethods
 
             while (!answerCheck || !amountWithinBalance)
             {
-                Console.Write("Ange hur mycket du vill föra över: ");
+                Console.Write($"\nAnge hur mycket du vill {action}: ");
                 answerCheck = Double.TryParse(Console.ReadLine(), out amountToHandle);
 
                 if (amountToHandle <= bankAccounts[customerIndex, accountIndexFrom, 0])
@@ -454,7 +456,7 @@ class MyMethods
                                       $"{accountNames[customerIndex, accountIndexFrom]}> är " +
                                       $"{bankAccounts[customerIndex, accountIndexFrom, 0].ToString(
                                           "C3", CultureInfo.CurrentCulture)}" +
-                                      $"\n\nDen summa du vill överföra kan inte överstiga nuvarande saldo.");
+                                      $"\n\nDen summa du anger kan inte överstiga nuvarande saldo.");
                     Console.WriteLine("\nTryck enter för att försöka igen!\n");
                     Console.ReadKey();
                 }
@@ -495,7 +497,48 @@ class MyMethods
     /// <returns></returns>
     public static double[,,] MoneyWithraw(int customerIndex, double[,,] bankAccounts, string[,] accountNames)
     {
+        //Variables that will be used and reused in the man loops below. 
+        string choiceFrom = "";
+        int accountIndexFrom = 0;
+        
+        //need a bool control the following loop that runs until we have a valid account to withraw from.
+        bool correctAccountFrom = false;
+
+        while (!correctAccountFrom)
+        {
+            AccountsAndBalance(customerIndex, bankAccounts, accountNames);
+
+            Console.Write("\nAnge det konto som du vill göra ett uttag från: ");
+            choiceFrom = Console.ReadLine().ToUpper();
+            for (int i = 0; i < accountNames.GetLength(1); i++)
+            {
+                if (accountNames[customerIndex, i].ToUpper() == choiceFrom)
+                {
+                    accountIndexFrom = i;
+                    correctAccountFrom = true;
+                }
+            }
+            if (!correctAccountFrom)
+            {
+                Console.WriteLine("Felaktig inmatning! Tryck enter för att försöka igen!");
+                Console.ReadKey();
+            }
+        }
+        
+        double amountToWithraw = AmountToHandle(bankAccounts, customerIndex, accountNames, accountIndexFrom, 
+            "ta ut");
+        
+        bankAccounts[customerIndex, accountIndexFrom, 0] -= amountToWithraw;
+
+        Console.Clear();
+        Console.WriteLine($"Uttaget lyckades! " +
+                          $"\n{choiceFrom}    Nytt saldo: " +
+                          $"{bankAccounts[customerIndex, accountIndexFrom, 0].ToString("C3",
+                              CultureInfo.CurrentCulture)})");
+
+        Console.WriteLine("\nTryck enter för att fortsätta");
+        Console.ReadKey();
+        
         return bankAccounts;
     }
-
 }
