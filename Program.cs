@@ -1,6 +1,7 @@
 ﻿//Jenny-Ann Hayward, SUT24
 
 using System.Globalization;
+using System.Security.Principal;
 
 namespace CashMashine_Lab4_SUT24;
 
@@ -274,14 +275,20 @@ class MyMethods
             switch (userChoice)
             {
                 case 1:
-                    Console.WriteLine("Se över konton och saldon");
+                    Console.WriteLine("KONTON OCH SALDON");
+                    Console.WriteLine("-------------------------------");
                     AccountsAndBalance(customerIndex, bankAccounts, accountNames);
+                    Console.WriteLine("Klicka enter för att komma till huvudmenyn!");
+                    Console.ReadKey();
                     break;
                 case 2:
-                    Console.WriteLine("Överföring mellan konton");
+                    Console.WriteLine("ÖVERFÖRING");
+                    Console.WriteLine("-------------------------------");
+                    bankAccounts = MyMethods.MoneyTransfer(customerIndex, bankAccounts, accountNames);
                     break;
                 case 3:
-                    Console.WriteLine("Ta ut Pengar");
+                    Console.WriteLine("UTTAG");
+                    Console.WriteLine("-------------------------------");
                     break;
                 case 4:
                     Console.Clear();
@@ -308,7 +315,7 @@ class MyMethods
     public static void AccountsAndBalance(int customerIndex, double[,,] bankAccounts, string[,] accountNames)
     {
         Console.Clear();
-        Console.WriteLine($"{accountNames[customerIndex, 0]}, du har just nu följande aktiva konton:");
+        Console.WriteLine($"{accountNames[customerIndex, 0]}, dina konton ser ut som följer:\n");
         
         //set i start at 1 since the personalnumber is on index 0, and i now want the accounts
         for (int i = 1; i < bankAccounts.GetLength(1); i++)
@@ -316,12 +323,130 @@ class MyMethods
             if (accountNames[customerIndex, i].Length != 0)
             {
                 double balance = bankAccounts[customerIndex, i, 0];  
-                Console.WriteLine($"{accountNames[customerIndex, i]}.        " +
+                Console.WriteLine($"[{i}] {accountNames[customerIndex, i]}.        " +
                                   $"saldo: {balance.ToString("C3", CultureInfo.CurrentCulture)}");
             }
         }
-
-        Console.WriteLine("Klicka enter för att komma till huvudmenyn!");
-        Console.ReadKey();
     }
+
+    public static double[,,] MoneyTransfer(int customerIndex, double[,,] bankAccounts, string[,] accountNames)
+    {
+        MyMethods.AccountsAndBalance(customerIndex, bankAccounts, accountNames);
+
+        string choiceFrom = "";
+        string choiceTo = "";
+        int accountIndexFrom = 0;
+        int accountIndexTo = 0;
+        bool correctaccounts = false;
+        double amountTransfer = 0;
+
+        while (!correctaccounts)
+        {
+            bool correctAccountFrom = false;
+
+            while (!correctAccountFrom)
+            {
+                Console.Write("\nAnge det konto som du vill föra en överföring från: ");
+                choiceFrom = Console.ReadLine().ToLower();
+                for (int i = 0; i < accountNames.GetLength(1); i++)
+                {
+                    if (accountNames[customerIndex, i].ToLower() == choiceFrom)
+                    {
+                        accountIndexFrom = i;
+                        correctAccountFrom = true;
+                    }
+                }
+                if (!correctAccountFrom)
+                {
+                    Console.WriteLine("Felaktig inmatning! Tryck enter för att försöka igen!");
+                    Console.ReadKey();
+                }
+            }
+
+            bool correctAccountTo = false;
+
+            while (!correctAccountTo)
+            {
+                Console.Write("\nAnge det konto som du vill föra en överföring från: ");
+                choiceTo = Console.ReadLine();
+                for (int i = 0; i < accountNames.GetLength(1); i++)
+                {
+                    if (accountNames[customerIndex, i] == choiceTo)
+                    {
+                        accountIndexTo = i;
+                        correctAccountTo = true;
+                    }
+                }
+                if (!correctAccountTo)
+                {
+                    Console.WriteLine("Felaktig inmatning! Tryck enter för att försöka igen!");
+                    Console.ReadKey();
+                }
+            }
+            Console.Clear();
+            Console.WriteLine($"Du har angett att du vill föra över pengar från < {choiceFrom} > till < {choiceTo} >" +
+                              $". Stämmer detta? (ja/nej)");
+            if (Console.ReadLine().ToLower() == "ja")
+            {
+                correctaccounts = true;
+            }
+            else
+            {
+                Console.WriteLine("Tryck enter för att lägga in konton på nytt!");
+            }
+        }
+
+
+
+
+
+        /*
+        while(!Int32.TryParse(Console.ReadLine(), out choiceFrom))
+        {
+            Console.WriteLine("Felaktigt val! försök igen!");
+        }
+
+        Console.Write("Ange nummer på det konto du vill föra över pengar till: ");
+        while(!Int32.TryParse(Console.ReadLine(), out choiceTo))
+        {
+            Console.WriteLine("Felaktigt val! försök igen!");
+        }
+*/
+        bool correctAmount = false;
+
+        while (!correctAmount)
+        {
+            Console.Write("Ange hur mycket du vill föra över: ");
+            while (!Double.TryParse(Console.ReadLine(), out amountTransfer))
+            {
+                Console.WriteLine("Felaktigt val! försök igen!");
+            }
+            Console.WriteLine($"Du har angett  {amountTransfer.ToString("C3", CultureInfo.CurrentCulture)}");
+            Console.Write("Stämmer detta? [ja/nej] ");
+            string answer = Console.ReadLine().ToLower();
+            
+            if (answer == "ja")
+            {
+                correctAmount = true;
+            } 
+            else if (answer == "nej")
+            {
+                Console.WriteLine("Försök igen!");
+            }
+            else
+            {
+                Console.WriteLine("Felaktigt svar! Försök igen!");
+            }
+        }
+        
+        /*
+        for (int i = 0; i < bankAccounts.GetLength(1); i++)
+        {
+            if (bankAccounts)
+        }
+        */
+        return bankAccounts;
+    
+    }
+
 }
