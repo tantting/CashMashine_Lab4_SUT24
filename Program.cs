@@ -99,22 +99,17 @@ class MyMethods
         
         for (int i = 0; i < customers.GetLength(0); i++)
         {
+            emptyAccountsArray[i, 0, 0] = customers[i, 1];
+            emptyAccountsArray[i, 0, 1] = customers[i, 2];
+            
             for (int j = 0; j < emptyAccountsArray.GetLength(1); j++)
             {
-                emptyAccountsArray[i, 0, 0] = customers[i, 1];
+                
 
                 if (j > 0 && accountNames[i, j].Length > 0)
                 {
                     emptyAccountsArray[i, j, 0] = startbalances[indexbalance];
                     indexbalance++;
-                }
-
-                for (int k = 0; k < emptyAccountsArray.GetLength(2); k++)
-                {
-                    if (j != 0 && k != 0 && accountNames[i, j].Length > 0)
-                    {
-                        emptyAccountsArray[i, j, k] = 1;
-                    }
                 }
             }
         }
@@ -139,6 +134,8 @@ class MyMethods
         for (int i = 0; i < bankAccounts.GetLength(0); i++)
         {
             Console.WriteLine($"kund: {i + 1}");
+            Console.WriteLine($"Personnummer: {bankAccounts[i, 0, 0]}");
+            Console.WriteLine($"Lösenord:{bankAccounts[i, 0, 1]}");
 
             for (int j = 0; j < bankAccounts.GetLength(1); j++)
             {
@@ -146,18 +143,9 @@ class MyMethods
                 if (j > 0 && accountNames[i, j].Length > 0)
                 {
                     indexbalance++;
-                    Console.Write($"   {accountNames[i, j]}: {bankAccounts[i, j, 0]} sek");
-                }
-
-                for (int k = 0; k < bankAccounts.GetLength(2); k++)
-                {
-                    if (j != 0 && k != 0 && accountNames[i, j].Length > 0)
-                    {
-                        Console.Write($"   status(1=aktivt): {bankAccounts[i, j, k]}");
-                    }
+                    Console.Write($"{accountNames[i, j]}: {bankAccounts[i, j, 0]} sek       ");
                 }
             }
-            Console.WriteLine($"\nPersonnummer: {bankAccounts[i, 0, 0]}");
             Console.WriteLine();
         }
     }
@@ -196,24 +184,7 @@ class MyMethods
                 }
             } while (!correctPersNr);
 
-            long password = 0;
-            bool correctPassword = false;
-
-            do
-            {
-                Console.Clear();
-                Console.Write("Ange ditt lösenord, 4 siffror: ");
-                string inputPassword = Console.ReadLine();
-                if ((inputPassword.Length == 4) && Int64.TryParse(inputPassword, out password))
-                {
-                    correctPassword = true;
-                }
-                else
-                {
-                    Console.WriteLine("Felaktigt format på lösenordet!\n\nTryck valfri tangent för att försöka igen");
-                    Console.ReadKey();
-                }
-            } while (!correctPassword);
+            long password = AskForPassword();
             
             for (int i = 0; i < customer.GetLength(0); i++)
             {
@@ -244,6 +215,35 @@ class MyMethods
             }
         }
         return customerIndex;
+    }
+    
+    //====================================================METHOD========================================================
+    /// <summary>
+    /// A method for asking for password. Used in login-method as well asd the Withdraw-method. 
+    /// </summary>
+    /// <returns></returns>
+    public static long AskForPassword()
+    {
+        long password = 0;
+        bool correctPassword = false;
+
+        do
+        {
+            Console.Clear();
+            Console.Write("Ange ditt lösenord, 4 siffror: ");
+            string inputPassword = Console.ReadLine();
+            if ((inputPassword.Length == 4) && Int64.TryParse(inputPassword, out password))
+            {
+                correctPassword = true;
+            }
+            else
+            {
+                Console.WriteLine("Felaktigt format på lösenordet!\n\nTryck valfri tangent för att försöka igen");
+                Console.ReadKey();
+            }
+        } while (!correctPassword);
+
+        return password;
     }
     
     //====================================================METHOD========================================================
@@ -442,21 +442,23 @@ class MyMethods
 
             while (!answerCheck || !amountWithinBalance)
             {
-                Console.Write($"\nAnge hur mycket du vill {action}: ");
+                Console.Write($"Ange hur mycket du vill {action}: ");
                 answerCheck = Double.TryParse(Console.ReadLine(), out amountToHandle);
 
-                if (amountToHandle <= bankAccounts[customerIndex, accountIndexFrom, 0])
+                if (amountToHandle <= bankAccounts[customerIndex, accountIndexFrom, 0] &&
+                    amountToHandle > 0)
                 {
                     amountWithinBalance = true;
                 }
-                else if (amountToHandle > bankAccounts[customerIndex, accountIndexFrom, 0])
+                else if (amountToHandle > bankAccounts[customerIndex, accountIndexFrom, 0] || amountToHandle <= 0)
                 {
                     Console.Clear();
                     Console.WriteLine($"Nuvarande saldo på <" +
                                       $"{accountNames[customerIndex, accountIndexFrom]}> är " +
                                       $"{bankAccounts[customerIndex, accountIndexFrom, 0].ToString(
                                           "C3", CultureInfo.CurrentCulture)}" +
-                                      $"\n\nDen summa du anger kan inte överstiga nuvarande saldo.");
+                                      $"\n\nDen summa du anger måste vara över 0 och kan inte överstiga nuvarande " +
+                                      $"saldo.");
                     Console.WriteLine("\nTryck enter för att försöka igen!\n");
                     Console.ReadKey();
                 }
@@ -527,6 +529,41 @@ class MyMethods
         
         double amountToWithraw = AmountToHandle(bankAccounts, customerIndex, accountNames, accountIndexFrom, 
             "ta ut");
+        
+        Console.WriteLine("För att få göra uttag behöver du ange godkänd pinkkod. \n");
+
+        bool runPinLoop = true;
+        bool correctpin = false;
+        int numberTried = 0;
+        
+
+        while (runPinLoop)
+        {
+            long pin = AskForPassword();
+            if (pin == bankAccounts[customerIndex, 0, 1])
+            {
+                correctpin = true; 
+                runPinLoop = false; 
+            }
+            else
+            {
+                Console.WriteLine("Fel pinkod! Tryck enter för att försöka igen!");
+                Console.ReadKey();
+            }
+            numberTried++;
+            if (!correctpin && numberTried == 3)
+            {
+                Console.WriteLine("Du har dessvärre angett fel, 3 gånger!" +
+                                  "\n\nTryck enter för att komma tillbaka till huvudmenyn!");
+                Console.ReadKey();
+                runPinLoop = false;
+            }
+        }
+
+        if (!correctpin)
+        {
+            HeadMenu(customerIndex, bankAccounts, accountNames);
+        }
         
         bankAccounts[customerIndex, accountIndexFrom, 0] -= amountToWithraw;
 
