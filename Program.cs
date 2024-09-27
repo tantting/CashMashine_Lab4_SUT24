@@ -336,7 +336,6 @@ class MyMethods
         string choiceTo = "";
         int accountIndexFrom = 0;
         int accountIndexTo = 0;
-        double amountTransfer = 0;
         
         //need a bool control the following loop that runs until we have a valid account to transfer from and one
         //to transfer to
@@ -408,57 +407,7 @@ class MyMethods
                 Console.Clear();
             }
         }
-        bool correctAmount = false;
-
-        while (!correctAmount)
-        {
-            bool amountWithinBalance = false;
-            bool answerCheck = false;
-            
-            while (!answerCheck || !amountWithinBalance)
-            {
-                Console.Write("Ange hur mycket du vill föra över: ");
-                answerCheck = Double.TryParse(Console.ReadLine(), out amountTransfer);
-                
-                if (amountTransfer <= bankAccounts[customerIndex, accountIndexFrom, 0])
-                {
-                    amountWithinBalance = true;
-                }
-                else if (amountTransfer > bankAccounts[customerIndex, accountIndexFrom, 0])
-                {
-                    Console.Clear();
-                    Console.WriteLine($"Nuvarande saldo på <" +
-                                      $"{accountNames[customerIndex, accountIndexFrom]}> är " +
-                                          $"{bankAccounts[customerIndex, accountIndexFrom, 0].ToString(
-                                              "C3", CultureInfo.CurrentCulture)}" +
-                                          $"\n\nDen summa du vill överföra kan inte överstiga nuvarande saldo.");
-                    Console.WriteLine("\nTryck enter för att försöka igen!\n");
-                    Console.ReadKey();
-                }
-                else
-                {
-                    Console.WriteLine("\nFelaktigt val! Tryck enter för att försöka igen!\n");
-                    Console.ReadKey();
-                }
-            }
-
-            Console.WriteLine($"\nDu har angett  {amountTransfer.ToString("C3", CultureInfo.CurrentCulture)}");
-            Console.Write("\nStämmer detta? [ja/nej] ");
-            string answer = Console.ReadLine().ToLower();
-            
-            if (answer == "ja")
-            {
-                correctAmount = true;
-            } 
-            else if (answer == "nej")
-            {
-                Console.WriteLine("\nOkey! Var god och försök igen!");
-            }
-            else
-            {
-                Console.WriteLine("\nFelaktigt svar! Försök igen!");
-            }
-        }
+        double amountTransfer = AmountToHandle(bankAccounts, customerIndex, accountNames, accountIndexFrom);
 
         bankAccounts[customerIndex, accountIndexFrom, 0] -= amountTransfer;
         bankAccounts[customerIndex, accountIndexTo, 0] += amountTransfer;
@@ -473,7 +422,80 @@ class MyMethods
         
         Console.WriteLine("\nTryck enter för att fortsätta");
         return bankAccounts;
+    }
     
+    //====================================================METHOD========================================================
+    
+    public static double AmountToHandle(double[,,] bankAccounts, int customerIndex,  string[,] accountNames, 
+    int accountIndexFrom)
+    {
+        double amountToHandle = 0;
+
+        bool correctAmount = false;
+
+        while (!correctAmount)
+        {
+            bool amountWithinBalance = false;
+            bool answerCheck = false;
+
+            while (!answerCheck || !amountWithinBalance)
+            {
+                Console.Write("Ange hur mycket du vill föra över: ");
+                answerCheck = Double.TryParse(Console.ReadLine(), out amountToHandle);
+
+                if (amountToHandle <= bankAccounts[customerIndex, accountIndexFrom, 0])
+                {
+                    amountWithinBalance = true;
+                }
+                else if (amountToHandle > bankAccounts[customerIndex, accountIndexFrom, 0])
+                {
+                    Console.Clear();
+                    Console.WriteLine($"Nuvarande saldo på <" +
+                                      $"{accountNames[customerIndex, accountIndexFrom]}> är " +
+                                      $"{bankAccounts[customerIndex, accountIndexFrom, 0].ToString(
+                                          "C3", CultureInfo.CurrentCulture)}" +
+                                      $"\n\nDen summa du vill överföra kan inte överstiga nuvarande saldo.");
+                    Console.WriteLine("\nTryck enter för att försöka igen!\n");
+                    Console.ReadKey();
+                }
+                else
+                {
+                    Console.WriteLine("\nFelaktigt val! Tryck enter för att försöka igen!\n");
+                    Console.ReadKey();
+                }
+            }
+
+            Console.WriteLine($"\nDu har angett  {amountToHandle.ToString("C3", CultureInfo.CurrentCulture)}");
+            Console.Write("\nStämmer detta? [ja/nej] ");
+            string answer = Console.ReadLine().ToLower();
+
+            if (answer == "ja")
+            {
+                correctAmount = true;
+            }
+            else if (answer == "nej")
+            {
+                Console.WriteLine("\nOkey! Var god och försök igen!");
+            }
+            else
+            {
+                Console.WriteLine("\nFelaktigt svar! Försök igen!");
+            }
+        }
+
+        return amountToHandle;
+    }
+
+    /// <summary>
+    /// A method for withdraw money from bank accounts
+    /// </summary>
+    /// <param name="customerIndex"></param>
+    /// <param name="bankAccounts"></param>
+    /// <param name="accountNames"></param>
+    /// <returns></returns>
+    public static double[,,] MoneyWithraw(int customerIndex, double[,,] bankAccounts, string[,] accountNames)
+    {
+        return bankAccounts;
     }
 
 }
