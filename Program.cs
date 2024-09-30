@@ -13,8 +13,8 @@ class Program
     static void Main(string[] args)
     {
         int customerIndex;
-        //Initiate a multi dim array for storing user nr, id(personal nummber) and passsword of the five customers
-        //need to be of type long to store the personal numbers
+        //Initiate a multi dim array for storing user nr, id(personal nummber) and passsword/pin codes of the five
+        //customers need to be of type long to store the personal numbers
         long[,] customers =
         {
             { 1, 1111111111, 1234 }, { 2, 6412235334, 6334 }, { 3, 9704304647, 2674 },
@@ -54,7 +54,7 @@ class Program
             switch (Console.ReadLine())
             {
                 case "1":
-                    customerIndex = MyMethods.LogIn(customers);
+                    customerIndex = MyMethods.LogIn(bankAccounts);
                     //if customerIndex is -1, the user has not been able to login. 
                     if (customerIndex == -1)
                     {
@@ -153,7 +153,7 @@ class MyMethods
     /// <summary>
     /// A method for user login
     /// </summary>
-    public static int LogIn(long[,] customer)
+    public static int LogIn(double[,,] bankAccounts)
     {
         //need a variable that can hold and return the personalnumber if login succeed. 
         int customerIndex = 0; 
@@ -163,7 +163,8 @@ class MyMethods
 
         while (runLogin)
         { 
-            //need variable to store the user input
+            //need variable to store the user input and one to use for running a do...while loop that keeps on running 
+            //until the personal number is only in digits and of the correct length. 
             long personNr = 0;
             bool correctPersNr = false;
         
@@ -183,12 +184,13 @@ class MyMethods
                     Console.ReadKey();
                 }
             } while (!correctPersNr);
-
-            long password = AskForPassword();
             
-            for (int i = 0; i < customer.GetLength(0); i++)
+            Console.Clear();
+            long pinCode = AskForPinCode();
+            
+            for (int i = 0; i < bankAccounts.GetLength(0); i++)
             {
-                if ((personNr == customer[i, 1]) && (password == customer[i, 2]))
+                if ((personNr == bankAccounts[i, 0, 0]) && (pinCode == bankAccounts[i, 0, 1]))
                 {
                     customerIndex = i;
                     runLogin = false;
@@ -199,7 +201,7 @@ class MyMethods
             //runLogin true means login did not succeed. Password and personal nr did not match
             if (runLogin)
             {
-                Console.WriteLine("\nDitt personnummer eller lösenord stämmer inte");
+                Console.WriteLine("\nDitt personnummer eller pinkod stämmer inte");
                 Console.WriteLine("\nTryck valfri tangent för att komma vidare!");
                 Console.ReadKey();
             }
@@ -222,28 +224,27 @@ class MyMethods
     /// A method for asking for password. Used in login-method as well asd the Withdraw-method. 
     /// </summary>
     /// <returns></returns>
-    public static long AskForPassword()
+    public static long AskForPinCode()
     {
-        long password = 0;
-        bool correctPassword = false;
+        long pinCode = 0;
+        bool correctPinCode = false;
 
         do
         {
-            Console.Clear();
-            Console.Write("Ange ditt lösenord, 4 siffror: ");
+            Console.Write("Ange din pinkod, 4 siffror: ");
             string inputPassword = Console.ReadLine();
-            if ((inputPassword.Length == 4) && Int64.TryParse(inputPassword, out password))
+            if ((inputPassword.Length == 4) && Int64.TryParse(inputPassword, out pinCode))
             {
-                correctPassword = true;
+                correctPinCode = true;
             }
             else
             {
-                Console.WriteLine("Felaktigt format på lösenordet!\n\nTryck valfri tangent för att försöka igen");
+                Console.WriteLine("Felaktigt format på pinkoden!\n\nTryck valfri tangent för att försöka igen");
                 Console.ReadKey();
             }
-        } while (!correctPassword);
+        } while (!correctPinCode);
 
-        return password;
+        return pinCode;
     }
     
     //====================================================METHOD========================================================
@@ -278,7 +279,7 @@ class MyMethods
                     Console.WriteLine("KONTON OCH SALDON");
                     Console.WriteLine("-------------------------------");
                     AccountsAndBalance(customerIndex, bankAccounts, accountNames);
-                    Console.WriteLine("Klicka enter för att komma till huvudmenyn!");
+                    Console.WriteLine("\nKlicka enter för att komma till huvudmenyn!");
                     Console.ReadKey();
                     break;
                 case 2:
@@ -530,7 +531,9 @@ class MyMethods
         double amountToWithraw = AmountToHandle(bankAccounts, customerIndex, accountNames, accountIndexFrom, 
             "ta ut");
         
-        Console.WriteLine("För att få göra uttag behöver du ange godkänd pinkkod. \n");
+        Console.WriteLine("För att få göra uttag behöver du ange godkänd pinkkod. Tryck enter för att ange pinkod\n");
+        Console.ReadKey();
+        Console.Clear();
 
         bool runPinLoop = true;
         bool correctpin = false;
@@ -539,7 +542,7 @@ class MyMethods
 
         while (runPinLoop)
         {
-            long pin = AskForPassword();
+            long pin = AskForPinCode();
             if (pin == bankAccounts[customerIndex, 0, 1])
             {
                 correctpin = true; 
