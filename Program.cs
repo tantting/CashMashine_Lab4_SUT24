@@ -29,19 +29,19 @@ class Program
     static void Main(string[] args)
     {
         
-        bankAccounts[0] = new decimal[,] { { 1241234, 27030m }, { 4352365, 89232.73m }, { 3446564, 170212m } };
-        bankAccounts[1] = new decimal[,] { { 3457844, 41620.70m } };
-        bankAccounts[2] = new decimal[,] { { 7524563, 22011m }, { 7543453, 43000m } };
-        bankAccounts[3] = new decimal[,] { { 5674343, 51000.35m }, { 4563455, 11232.50m }, { 6545421, 36021m }, 
+        bankAccounts[0] = new [,] { { 1241234, 27030m }, { 4352365, 89232.73m }, { 3446564, 170212m } };
+        bankAccounts[1] = new [,] { { 3457844, 41620.70m } };
+        bankAccounts[2] = new [,] { { 7524563, 22011m }, { 7543453, 43000m } };
+        bankAccounts[3] = new [,] { { 5674343, 51000.35m }, { 4563455, 11232.50m }, { 6545421, 36021m }, 
             { 4453212, 12421.83m }, { 5312321, 25000m } };
-        bankAccounts[4] = new decimal[,] { {1232321, 29432.20m}, {1232312, 42819.60m}, {1232121, 8359m}, 
+        bankAccounts[4] = new [,] { {1232321, 29432.20m}, {1232312, 42819.60m}, {1232121, 8359m}, 
             {4567842, 23451m} };
         
-        accountNames[0] = new string[] { "Lönekonto", "buffer", "pension" };
-        accountNames[1] = new string[] { "Lönekonto" };
-        accountNames[2] = new string[] { "Lönekonto", "pension" };
-        accountNames[3] = new string[] { "Lönekonto", "semesterspar", "bröllop", "pension", "ny bil"};
-        accountNames[4] = new string[] { "Lönekonto", "spar", "syjuntan", "sparTillBarnen" };
+        accountNames[0] = [ "Lönekonto", "buffer", "pension" ];
+        accountNames[1] = [ "Lönekonto" ];
+        accountNames[2] = [ "Lönekonto", "pension" ];
+        accountNames[3] = [ "Lönekonto", "semesterspar", "bröllop", "pension", "ny bil" ];
+        accountNames[4] = [ "Lönekonto", "spar", "syjuntan", "sparTillBarnen" ];
         
         //declare ta variable for storing the customerIndex in the arryes bankaccountsand accountNames. This 
         //corresponds to the index number on of the first dimension in respective array. 
