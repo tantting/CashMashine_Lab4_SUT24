@@ -5,51 +5,57 @@ using System.Globalization;
 namespace CashMashine_Lab4_SUT24;
 
 //========================================================CLASS========================================================
-//A program class with the main method for running the program
+//A program class with the main method for running the program. 
+
+//This program is an internetbank with 5 customers.As a starting point they all have different amount of accounts
 //=====================================================================================================================
 
 class Program
 {
+    //Store the name[index 0], personal number [index 1] and password [index 2] of all customers in a 2D array.
     static string[,] customers =
     {
-        { "Johan Ottosson", "1111111111", "1111" },
-        { "Maria Isaksson", "2222222222", "2222" },
-        { "Jörgen Persson", "3333333333", "3333" },
-        { "Ann-Charlotte Svensson", "4444444444", "4444" }, 
-        { "Ismail Mohamed", "5555555555", "5555" }
+        { "Johan Ottosson", "8204084647", "1234" },
+        { "Ismail Mohamed", "9612304648", "4321" },
+        { "Jörgen Persson", "2107205323", "3333" },
+        { "Ann-Charlotte Svensson", "6906254673", "4444" }, 
+        { "Britta Isaksson", "5611236434", "5555" }
     };
     
-    //A jagged 2D-array, storing account numbers and balances of five customers. 
-    // each row representes one customer and display info:
-    // { {balance account 1, accountnr 1} {balance account 2, accountnr 2} }; 
+    //A jagged 2D-array, storing account numbers and balances of five customers.Index of the outer array corresponds to  
+    // the index in the customer-array.
+    // Bbelow (in Main), each row is intitiated data. Each row represents one customer and display the following info:
+    // { { accountnr 1, balance account 1 } {accountnr 2, balance account 2}  etc }; 
     static decimal[][,] bankAccounts = new decimal[5][,];
     
-    //A jagged array of account names
+    //A jagged array of account names, indexes are related, eg bankAccounts[i][j,] and accountNames[i][j].
     static string[][] accountNames = new string[5][];
+    
     static void Main(string[] args)
     {
         
-        bankAccounts[0] = new decimal[,] { { 1241234, 27030m }, { 4352365, 89232.73m }, { 3446564, 170212m } };
-        bankAccounts[1] = new decimal[,] { { 3457844, 41620.70m } };
-        bankAccounts[2] = new decimal[,] { { 7524563, 22011m }, { 7543453, 43000m } };
-        bankAccounts[3] = new decimal[,] { { 5674343, 51000.35m }, { 4563455, 11232.50m }, { 6545421, 36021m }, 
-            { 4453212, 12421.83m }, { 5312321, 25000m } };
-        bankAccounts[4] = new decimal[,] { {1232321, 29432.20m}, {1232312, 42819.60m}, {1232121, 8359m}, 
-            {4567842, 23451m} };
+        bankAccounts[0] = new [,] { { 1241234, 27030.50m }, { 4352365, 89232.73m }, { 3446564, 170212.20m } };
+        bankAccounts[1] = new [,] { { 3457844, 41620.70m } };
+        bankAccounts[2] = new [,] { { 7524563, 22011m }, { 7543453, 43000.99m } };
+        bankAccounts[3] = new [,] { { 5674343, 51000.35m }, { 4563455, 11232.50m }, { 6545421, 36021.10m }, 
+            { 4453212, 12421.83m }, { 5312321, 25000.00m } };
+        bankAccounts[4] = new [,] { {1232321, 29432.20m}, {1232312, 42819.60m}, {1232121, 8359.05m}, 
+            {4567842, 23451.50m} };
         
-        accountNames[0] = new string[] { "Lönekonto", "buffer", "pension" };
-        accountNames[1] = new string[] { "Lönekonto" };
-        accountNames[2] = new string[] { "Lönekonto", "pension" };
-        accountNames[3] = new string[] { "Lönekonto", "semesterspar", "bröllop", "pension", "ny bil"};
-        accountNames[4] = new string[] { "Lönekonto", "spar", "syjuntan", "sparTillBarnen" };
+        accountNames[0] = [ "Lönekonto", "buffer", "pension" ];
+        accountNames[1] = [ "Lönekonto" ];
+        accountNames[2] = [ "Lönekonto", "pension" ];
+        accountNames[3] = [ "Lönekonto", "semesterspar", "bröllop", "pension", "ny bil" ];
+        accountNames[4] = [ "Lönekonto", "spar", "syjuntan", "sparTillBarnen" ];
         
-        //declare ta variable for storing the customerIndex in the arryes bankaccountsand accountNames. This 
-        //corresponds to the index number on of the first dimension in respective array. 
+        //declare a variable for storing the customerIndex for the arryes customers,  bankaccounts and accountNames. 
         int customerIndex;
+        
         bool runApp = true;
         
         while (runApp)
         {
+            Console.Clear();
             Console.WriteLine("Välkommen till din internetbank\n\n" +
                               "[1] Logga in\n" +
                               "[2] Stäng ner"); 
@@ -93,15 +99,15 @@ class MyMethods
     /// <returns></returns>
     public static int LogIn(string[,] customers)
     {
-        //need a variable that can hold and return the personalnumber if login succeed. 
+        //need a golden variable that hold and return the customer index if login succeed. 
         int customerIndex = 0; 
-        bool runLogin = true;
         int numberTried = 0;
+        bool runLogin = true;
 
         while (runLogin)
         { 
-            //need variable to store the user input and one to use for running a do...while loop that keeps on running 
-            //until the personal number is only in digits and of the correct length. 
+            //use a bool for running a do...while loop that keeps on running until the personal number is only in
+            //digits and of the correct length. 
             string personNr = "";
             bool correctPersNr = false;
         
@@ -110,7 +116,7 @@ class MyMethods
                 Console.Clear();
                 Console.Write("Ange ditt personnummer (YYMMDDXXXX): ");
                 string inputPersNr = Console.ReadLine();
-                //Test that the user enters numbers and of the right length personalNrLong is not used other contexts.
+                //Test that the user enters numbers and of the right length (personalNrLong is not used other contexts).
                 if ((inputPersNr.Length == 10) && (Int64.TryParse(inputPersNr, out long personNrLong)))
                 {
                     personNr = inputPersNr;
@@ -137,6 +143,7 @@ class MyMethods
                 }
             }
             numberTried++;
+            
             //runLogin true means login did not succeed. Password and personal nr did not match
             if (runLogin)
             {
@@ -162,9 +169,10 @@ class MyMethods
     
     //====================================================METHOD========================================================
     /// <summary>
-    /// A method for asking for password. Used in login-method as well asd the Withdraw-method. 
+    /// A method for asking for password. Checks that the user input 4 digits. Does not check if the password is
+    /// correct. 
     /// </summary>
-    /// <returns></returns>
+    /// <returns>the entered pin-code if entered in the correct form</returns>
     public static string AskForPinCode()
     {
         string pinCode = "";
@@ -174,6 +182,7 @@ class MyMethods
         {
             Console.Write("Ange din pinkod, 4 siffror: ");
             string inputPinCode = Console.ReadLine();
+            //even if I do not need to parse the input, I use TryParse to check that the user input 4 digits. 
             if ((inputPinCode.Length == 4) && Int32.TryParse(inputPinCode, out int pinInt))
             {
                 pinCode = inputPinCode; 
@@ -191,14 +200,14 @@ class MyMethods
     
     //====================================================METHOD========================================================
     /// <summary>
-    /// A menthod for running the head menu of user options once logged in.
+    /// A menthod for running the "head"/main menu of actions. 
     /// </summary>
     /// <param name="customers"></param>
     /// <param name="customerIndex"></param>
     /// <param name="bankAccounts"></param>
     /// <param name="accountNames"></param>
     /// <returns></returns>
-    public static bool HeadMenu(string[,] customers, int customerIndex, decimal[][,] bankAccounts,
+    public static void HeadMenu(string[,] customers, int customerIndex, decimal[][,] bankAccounts,
         string[][] accountNames)
     {
         bool runMenu = true;
@@ -224,39 +233,32 @@ class MyMethods
             switch (userChoice)
             {
                 case 1:
-                    Console.WriteLine("KONTON OCH SALDON");
-                    Console.WriteLine("-------------------------------");
                     AccountsAndBalance(customers, customerIndex, bankAccounts, accountNames);
-                    Console.WriteLine("\nKlicka enter för att komma till huvudmenyn!");
-                    Console.ReadKey();
                     break;
                 case 2:
-                    Console.WriteLine("ÖVERFÖRING");
-                    Console.WriteLine("-------------------------------");
                     MoneyTransfer(customers, customerIndex, bankAccounts, accountNames);
                     break;
                 case 3:
-                    Console.WriteLine("UTTAG");
-                    Console.WriteLine("-------------------------------");
                     MoneyWithraw(customers, customerIndex, bankAccounts, accountNames);
                     break;
                 case 4:
-                    Console.WriteLine("ÖPPNA NYTT KONTO");
                     OpenAccounts(bankAccounts, customerIndex, accountNames);
                     break;
                 case 5:
                     Console.Clear();
                     Console.WriteLine("Tack för denna gång! Ha en trevlig dag!\n");
                     runMenu = false;
-                    break;
+                    continue;
                 default:
                     Console.WriteLine("Du måste ange en siffra mellan 1 och 4! Tryck på valfri tangent för att " +
                                       "försöka igen!");
                     Console.ReadKey();
                     break;
             }
+
+            Console.WriteLine("\nKLICKA ENTER för att komma till huvudmenyn");
+            Console.ReadKey();
         }
-        return runMenu;
     }
     
     //====================================================METHOD========================================================
@@ -271,14 +273,17 @@ class MyMethods
         string[][] accountNames)
     {
         Console.Clear();
+        
         Console.WriteLine($"{customers[customerIndex, 0]}, dina konton ser ut som följer:\n");
        
         for (int i = 0; i < bankAccounts[customerIndex].GetLength(0); i++)
         {
             decimal accountNr = bankAccounts[customerIndex][i, 0];
             decimal balance = bankAccounts[customerIndex][i, 1]; 
-                Console.WriteLine($"[{i+1}]   {accountNames[customerIndex][i], -10} ({accountNr})          " +
-                                  $"saldo: {balance.ToString("C3", CultureInfo.CurrentCulture), -10}");
+            //use string.Format to adjust the text into columns and align the text to the left of these columns.  
+            const string format = "{0,-5} {1,-30} {2, -20}";
+            Console.WriteLine(format, $"[{i+1}]", $"{accountNames[customerIndex][i]} ({accountNr})",
+                                      $"saldo: {balance:C}");
         }
     }
     //====================================================METHOD========================================================
@@ -298,9 +303,11 @@ class MyMethods
         string choiceTo = "";
         int accountIndexFrom = 0;
         int accountIndexTo = 0;
+        //use a format variable again to format the print-outs in this method. 
+        const string format = "{0,-20} {1,30}";
         
         //need a bool control the following loop that runs until we have a valid account to transfer from and one
-        //to transfer to
+        //to transfer to. inside this loop, we have one loop to loops to ensure valid accounts from and
         bool correctaccounts = false;
     
         while (!correctaccounts)
@@ -311,17 +318,16 @@ class MyMethods
             {
                 AccountsAndBalance(customers, customerIndex, bankAccounts, accountNames);
                 
-                Console.Write("\nAnge det konto som du vill göra en överföring från: ");
+                Console.Write("\nAnge det konto som du vill göra en överföring från (tryck esc för att avbryta): ");
                 choiceFrom = Console.ReadLine().ToUpper();
-                for (int i = 0; i < accountNames[customerIndex].Length; i++)
+
+                accountIndexFrom = ValidAccount(accountNames, customerIndex, choiceFrom);
+
+                if (accountIndexFrom != -1)
                 {
-                    if (accountNames[customerIndex][i].ToUpper() == choiceFrom)
-                    {
-                        accountIndexFrom = i;
-                        correctAccountFrom = true;
-                    }
+                    correctAccountFrom = true; 
                 }
-                if (!correctAccountFrom)
+                else
                 {
                     Console.WriteLine("Felaktig inmatning! Tryck enter för att försöka igen!");
                     Console.ReadKey();
@@ -334,32 +340,32 @@ class MyMethods
             {
                 Console.Write("\nAnge det konto som du vill göra en överföring till: ");
                 choiceTo = Console.ReadLine().ToUpper();
-                for (int i = 0; i < accountNames[customerIndex].Length; i++)
+
+                accountIndexTo = ValidAccount(accountNames, customerIndex, choiceTo);
+                
+                if (accountIndexTo != -1)
                 {
-                    if (accountNames[customerIndex][i].ToUpper() == choiceTo)
-                    {
-                        accountIndexTo = i;
-                        correctAccountTo = true;
-                    }
+                    correctAccountTo = true; 
                 }
-                if (!correctAccountTo)
+                else
                 {
                     Console.WriteLine("\nFelaktig inmatning! Tryck enter för att försöka igen!");
                     Console.ReadKey();
                 }
             }
             Console.Clear();
-            //Since balance 
+            
             Console.WriteLine($"Du har angett att du vill göra en överföring" +
                               $"\n\nfrån\n");
-            const string format = "{0,-20} {1,30}";
+            
             Console.WriteLine(format, $"{choiceFrom} ({bankAccounts[customerIndex][accountIndexFrom, 0]})", 
-                              $"saldo: {bankAccounts[customerIndex][accountIndexFrom, 1].ToString(
-                                  "C3", CultureInfo.CurrentCulture)}");
+                $"saldo: {bankAccounts[customerIndex][accountIndexFrom, 1]:C}");
+            
             Console.WriteLine("\ntill\n");
+            
             Console.WriteLine(format, $"{choiceTo} ({bankAccounts[customerIndex][accountIndexTo, 0]})", 
-                $"saldo: {bankAccounts[customerIndex][accountIndexTo, 1].ToString(
-                "C3", CultureInfo.CurrentCulture)}");
+                $"saldo: {bankAccounts[customerIndex][accountIndexTo, 1]:C}");
+            
             Console.Write("\nStämmer detta? (ja/nej): ");
             if (Console.ReadLine().ToLower() == "ja")
             {
@@ -380,15 +386,27 @@ class MyMethods
         bankAccounts[customerIndex][accountIndexTo, 1] += amountTransfer;
         
         Console.Clear();
-        Console.WriteLine($"Överföring lyckades! " +
-                          $"\n{choiceFrom}    Nytt saldo: " +
-                          $"{bankAccounts[customerIndex][accountIndexFrom, 1].ToString("C3", 
-                              CultureInfo.CurrentCulture)})" +
-                          $"\n{choiceTo}      Nytt saldo: {bankAccounts[customerIndex][accountIndexTo, 1].ToString(
-                              "C3", CultureInfo.CurrentCulture)}) >");
-        
-        Console.WriteLine("\nTryck enter för att fortsätta");
-        Console.ReadKey();
+        Console.WriteLine($"Överföring lyckades!\n");
+        Console.WriteLine(format, $"{choiceFrom}", $"Nytt saldo: {bankAccounts[customerIndex][accountIndexFrom, 
+            1]:C}");
+        Console.WriteLine();
+        Console.WriteLine(format, $"{choiceTo}", $"Nytt saldo: {bankAccounts[customerIndex][accountIndexTo, 1]:C}");
+    }
+    //====================================================METHOD========================================================
+    
+    public static int ValidAccount(string[][] accountNames, int customerIndex, string choice)
+    {
+        int accountIndex = -1;
+        //Use a for-loop to step through all the account names of the actual customer.
+        for (int i = 0; i < accountNames[customerIndex].Length; i++)
+        {
+            if (accountNames[customerIndex][i].ToUpper() == choice)
+            {
+                accountIndex = i;
+                return accountIndex;
+            }
+        }
+        return accountIndex;
     }
     
     //====================================================METHOD========================================================
@@ -479,15 +497,14 @@ class MyMethods
     
             Console.Write("\nAnge det konto som du vill göra ett uttag från: ");
             choiceFrom = Console.ReadLine().ToUpper();
-            for (int i = 0; i < accountNames[customerIndex].Length; i++)
+
+            accountIndexFrom = ValidAccount(accountNames, customerIndex, choiceFrom);
+            
+            if (accountIndexFrom != -1)
             {
-                if (accountNames[customerIndex][i].ToUpper() == choiceFrom)
-                {
-                    accountIndexFrom = i;
-                    correctAccountFrom = true;
-                }
+                correctAccountFrom = true; 
             }
-            if (!correctAccountFrom)
+            else
             {
                 Console.WriteLine("Felaktig inmatning! Tryck enter för att försöka igen!");
                 Console.ReadKey();
@@ -537,7 +554,7 @@ class MyMethods
             }
         }
     }
-    
+
     //====================================================METHOD========================================================
     /// <summary>
     /// A method for open a new account.
@@ -586,6 +603,7 @@ class MyMethods
                 Console.WriteLine($"Nytt kontonummer: {newAccountNr}");
                 Console.Write("\nVad är namnet på ditt nya konto?:");
                 accountNames[customerIndex][accountNames[customerIndex].Length - 1] = Console.ReadLine();
+                Console.WriteLine("\nDitt nya konto är skapat!");
                 runLoop = false; 
             }
             else if (userChoice.ToLower() == "nej")
