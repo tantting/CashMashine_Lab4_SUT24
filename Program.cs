@@ -296,7 +296,7 @@ class MyMethods
     }
     //====================================================METHOD========================================================
     /// <summary>
-    /// 
+    /// A method for transfering money between accounts of the logged in customer. 
     /// </summary>
     /// <param name="customers"></param>
     /// <param name="customerIndex"></param>
