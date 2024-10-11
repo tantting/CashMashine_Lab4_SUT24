@@ -3,6 +3,7 @@
 using System.ComponentModel.Design;
 using System.Diagnostics.Contracts;
 using System.Globalization;
+using System.Xml;
 
 namespace CashMashine_Lab4_SUT24;
 
@@ -454,15 +455,16 @@ class MyMethods
     /// <param name="accountNames"></param>
     /// <param name="customerIndex"></param>
     /// <param name="choice"></param>
-    /// <returns>accountIndex</returns>
+    /// <returns>accountIndex (if a match) or -1 (if no match)</returns>
     public static int ValidAccount(string[][] accountNames, int customerIndex, string choice)
     {
         int accountIndex = -1;
         //Use a for-loop to step through all the account names of the actual customer to se if theres a match with the
-        //account name the user has entered in an earlier step (choice).If match, i is returnd as account index. 
+        //account name the user has entered in an earlier step (choice).If a match, i is returnd as account index.
+        //if no match, the accountIndex -1 is returned. 
         for (int i = 0; i < accountNames[customerIndex].Length; i++)
         {
-            if (accountNames[customerIndex][i].ToUpper() == choice)
+            if (accountNames[customerIndex][i].ToLower() == choice.ToLower())
             {
                 accountIndex = i;
                 return accountIndex;
@@ -474,14 +476,15 @@ class MyMethods
     //====================================================METHOD========================================================
     /// <summary>
     /// Ask for amount to transfer of withraw and validate that the amount is larger than 0 and less than the actual
-    /// balance of the account that money will be withrawn from. Returns and decimal amount.
+    /// balance of the account that money will be withrawn from. Returns and decimal amount or -1. -1 means user wish
+    /// to quit and return to head menu)
     /// </summary>
     /// <param name="bankAccounts"></param>
     /// <param name="customerIndex"></param>
     /// <param name="accountNames"></param>
     /// <param name="accountIndexFrom"></param>
     /// <param name="action"></param>
-    /// <returns>decimal amountToHandle</returns>
+    /// <returns>decimal amountToHandle or -1</returns>
     public static decimal AmountToHandle(decimal[][,] bankAccounts, int customerIndex,  string[][] accountNames, 
         int accountIndexFrom, string action)
     {
@@ -712,11 +715,46 @@ class MyMethods
                 Random random = new Random();
                 decimal newAccountNr = random.Next(999999, 10000000);
                 bankAccounts[customerIndex][bankAccounts[customerIndex].GetLength(0) - 1, 0] = newAccountNr;
+                Console.Clear();
                 Console.WriteLine($"Nytt kontonummer: {newAccountNr}");
+
+                bool correctName = false;
+                string newName = "";
+                //To be able and later on use the method ValidAccount to see if the suggested accountName already exists,
+                //I need to initiate the new account name. Otherwise, there will be an exception when the for-loop 
+                //check the name of the new account. 
+                accountNames[customerIndex][accountNames[customerIndex].Length - 1] = "";
                 
-                Console.Write("\nVad är namnet på ditt nya konto?:");
-                accountNames[customerIndex][accountNames[customerIndex].Length - 1] = Console.ReadLine();
-                Console.WriteLine("\nDitt nya konto är skapat!");
+                while (!correctName)
+                {
+                    Console.Write("\nVad är namnet på ditt nya konto?: ");
+                    newName= Console.ReadLine();
+                    if (newName.Length > 0)
+                    {
+                        int seeIfExistAlready = ValidAccount(accountNames, customerIndex, newName);
+
+                        if (seeIfExistAlready == -1)
+                        {
+                            Console.Write($"\nDet nya kontot ska heta < {newName} >. Stämmer det? [ja / nej]:  ");
+                            if (Console.ReadLine().ToLower() == "ja")
+                            {
+                                correctName = true; 
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Du har redan ett konto med det namnet! Försök igen!");
+                        }
+                    }
+                }
+                accountNames[customerIndex][accountNames[customerIndex].Length - 1] = newName;
+                
+                Console.Clear();
+                Console.WriteLine("Ditt nya konto är skapat!");
+                Console.WriteLine($"\nKontonummer: " +
+                                  $"{bankAccounts[customerIndex][bankAccounts[customerIndex].GetLength(0) - 1, 0]}" +
+                                  $"           Namn: "+
+                                  $"{accountNames[customerIndex][accountNames[customerIndex].Length - 1]}");
                 runLoop = false; 
             }
             //when user does not wish to create a new account, the loop ends. 
