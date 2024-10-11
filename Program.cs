@@ -426,16 +426,23 @@ class MyMethods
             //Use a method for asking the user for the amounts to transfer.
             decimal amountTransfer = AmountToHandle(bankAccounts, customerIndex, accountNames, accountIndexFrom,
                 "föra över");
+            
+            //amountTransfer = -1 means the use chose quit in the AmountToHandle method. 
+            if (amountTransfer != -1)
+            {
+                //the amount on the account to transfer from is decreased withe amountTransfer and the tp-account is 
+                //increased.
+                bankAccounts[customerIndex][accountIndexFrom, 1] -= amountTransfer;
+                bankAccounts[customerIndex][accountIndexTo, 1] += amountTransfer;
 
-            bankAccounts[customerIndex][accountIndexFrom, 1] -= amountTransfer;
-            bankAccounts[customerIndex][accountIndexTo, 1] += amountTransfer;
-
-            Console.Clear();
-            Console.WriteLine($"Överföring lyckades!\n");
-            Console.WriteLine(format, $"{choiceFrom}", $"Nytt saldo: {bankAccounts[customerIndex][accountIndexFrom,
-                1]:C}");
-            Console.WriteLine();
-            Console.WriteLine(format, $"{choiceTo}", $"Nytt saldo: {bankAccounts[customerIndex][accountIndexTo, 1]:C}");
+                Console.Clear();
+                Console.WriteLine($"Överföring lyckades!\n");
+                Console.WriteLine(format, $"{choiceFrom}", $"Nytt saldo: {bankAccounts[customerIndex][accountIndexFrom,
+                    1]:C}");
+                Console.WriteLine();
+                Console.WriteLine(format, $"{choiceTo}",
+                    $"Nytt saldo: {bankAccounts[customerIndex][accountIndexTo, 1]:C}");
+            }
         }
     }
 
@@ -486,23 +493,22 @@ class MyMethods
         while (askForAmountLoop)
         {
             bool amountWithinBalance = false;
-            bool answerCheck = false;
             
-            //this while loop will run as long as the TryParse-method of the answers returns false (input not numbers)
-            //or the amount is less than 0 or larger then the balance of the account. 
-            while (/*!answerCheck || */!amountWithinBalance)
+            //this while loop will run until the user has entered a number that is larger than 0 and less than the
+            //current balance of the account. 
+            while (!amountWithinBalance)
             {
                 Console.Write($"Ange hur mycket du vill {action}!" +
                               $"\n(skriv [quit] om du vill avbryta och återgå till huvudmenyn)" +
                               $"\n\nSumma att {action}: ");
                 string answerString = Console.ReadLine();
-
+                
                 if (answerString.ToLower() == "quit")
                 {
                     return -1; 
                 }
                 
-                answerCheck = Decimal.TryParse(answerString, out amountToHandle);
+                Decimal.TryParse(answerString, out amountToHandle);
     
                 if (amountToHandle <= bankAccounts[customerIndex][accountIndexFrom, 1] &&
                     amountToHandle > 0)
@@ -561,20 +567,21 @@ class MyMethods
         //Variables that will be used and reused in the man loops below. 
         string choiceFrom = "";
         int accountIndexFrom = 0;
-        
-        //need a bool control the following loop that runs until we have a valid account to withraw from.
         bool correctAccountFrom = false;
+        bool quit = false; 
         
-        //the same procedure as in Moneytransfer, but here I only need to validate a "from"-account, 
-        while (!correctAccountFrom)
+        //the same procedure as in Moneytransfer, but here I only need to validate a "from"-account.
+        while (!correctAccountFrom && !quit)
         {
             AccountsAndBalance(customers, customerIndex, bankAccounts, accountNames);
     
             Console.Write("\nAnge det konto som du vill göra ett uttag från! " +
-                          "\n([quit] om du istället önskar återgå till huvudmenyn):" +
+                          "\n(skriv [quit] om du vill avbryta och återgå till huvudmenyn):" +
                           "\n\nKonto från: ");
             choiceFrom = Console.ReadLine().ToUpper();
-
+            
+            //if the user wants to quite, the while-loop is broken and the condition on the following if-statement is not
+            //met, hence we are sent back to head meny. 
             if (choiceFrom == "QUIT")
             {
                 break; 
@@ -608,44 +615,49 @@ class MyMethods
             Console.WriteLine();
             decimal amountToWithraw = AmountToHandle(bankAccounts, customerIndex, accountNames, accountIndexFrom,
                 "ta ut");
-
-            Console.Clear();
-            Console.WriteLine(
-                "För att få göra uttag behöver vi bekräfta din identitet!\n");
-
-            bool runPinLoop = true;
-            bool correctpin = false;
-            int numberTried = 0;
-
-
-            while (runPinLoop)
+            
+            //if AmountToHandle returns -1, the user did not want to proceed and chose quit, hence the following code
+            //block should not be performed. 
+            if (amountToWithraw != -1)
             {
-                string pin = AskForPinCode();
-                if (pin == customers[customerIndex, 2])
-                {
-                    correctpin = true;
-                    runPinLoop = false;
+                Console.Clear();
+                Console.WriteLine(
+                    "För att få göra uttag behöver vi bekräfta din identitet!\n");
 
-                    bankAccounts[customerIndex][accountIndexFrom, 1] -= amountToWithraw;
+                bool runPinLoop = true;
+                bool correctpin = false;
+                int numberTried = 0;
 
-                    Console.Clear();
-                    Console.WriteLine($"Uttaget lyckades! " +
-                                      $"\n{choiceFrom}    Nytt saldo: " +
-                                      $"{bankAccounts[customerIndex][accountIndexFrom, 1]:C})");
-                }
-                else
-                {
-                    Console.WriteLine("Fel pinkod! Tryck valfri tangent för att försöka igen!");
-                    Console.ReadKey();
-                }
 
-                numberTried++;
-                if (!correctpin && numberTried == 3)
+                while (runPinLoop)
                 {
-                    Console.WriteLine("Du har dessvärre angett fel pinkod, 3 gånger!" +
-                                      "\n\nTryck valfri för att komma tillbaka till huvudmenyn!");
-                    Console.ReadKey();
-                    runPinLoop = false;
+                    string pin = AskForPinCode();
+                    if (pin == customers[customerIndex, 2])
+                    {
+                        correctpin = true;
+                        runPinLoop = false;
+
+                        bankAccounts[customerIndex][accountIndexFrom, 1] -= amountToWithraw;
+
+                        Console.Clear();
+                        Console.WriteLine($"Uttaget lyckades! " +
+                                          $"\n{choiceFrom}    Nytt saldo: " +
+                                          $"{bankAccounts[customerIndex][accountIndexFrom, 1]:C}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Fel pinkod! Tryck valfri tangent för att försöka igen!");
+                        Console.ReadKey();
+                    }
+
+                    numberTried++;
+                    if (!correctpin && numberTried == 3)
+                    {
+                        Console.WriteLine("Du har dessvärre angett fel pinkod, 3 gånger!" +
+                                          "\n\nTryck valfri för att komma tillbaka till huvudmenyn!");
+                        Console.ReadKey();
+                        runPinLoop = false;
+                    }
                 }
             }
         }
