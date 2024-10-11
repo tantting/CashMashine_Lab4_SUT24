@@ -53,9 +53,9 @@ Using classes and lists etc was not allowed so that wont be further mentioned.
 There is potenatial for making smaller methods and to do more of them, There are repetitions in the code currently,
 and a number of the methods are quite big. 
 
-One of the very last thing I entered was the option to quit once in one of the meny choices. The way is is done not, 
-cluttered to code I thinkg. It is less easy to read. Next time, I will keep this in mind earlier to have a more thought-
-throug solution for how to move around the different options. E.g. by using Consolekey more overall.
+One of the very last thing I entered was the option to quit once in one of the meny choices. This was not done in an optimal
+way. I was worse when I entered the assignment but with a more thought-throug plan for how to solve this throughout the entire
+program, it could be nicer from a user perspective and clutter the code less. 
 
 The interface could be nicer of course and some messages etc could be even more streamlined. 
 
