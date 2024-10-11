@@ -1,5 +1,6 @@
 ﻿//Jenny-Ann Hayward, SUT24
 
+using System.ComponentModel.Design;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 
@@ -294,6 +295,7 @@ class MyMethods
                 $"saldo: {balance:C}");
         } 
     }
+    
     //====================================================METHOD========================================================
     /// <summary>
     /// A method for transfering money between accounts of the logged in customer. 
@@ -302,7 +304,6 @@ class MyMethods
     /// <param name="customerIndex"></param>
     /// <param name="bankAccounts"></param>
     /// <param name="accountNames"></param>
-
     public static void MoneyTransfer(string[,] customers, int customerIndex, decimal[][,] bankAccounts,
         string[][] accountNames)
     {
@@ -315,14 +316,15 @@ class MyMethods
         const string format = "{0,-20} {1,30}";
 
         //use bools to control the following loops that runs until we have a valid account to transfer from and one
-        //to transfer to. One outerloop runs until the user confirms that he/she is content or enters quit. Inner loops
+        //to transfer to. One outer loop runs until the user confirms that he/she is content or enters quit. Inner loops
         //ask for inpt and validate that there are correcponding accounts. 
         bool correctaccounts = false;
         bool correctAccountFrom = false;
         bool correctAccountTo = false;
+        bool quit = false; 
 
 
-        while (!correctaccounts)
+        while (!correctaccounts && !quit)
         {
             while (!correctAccountFrom)
             {
@@ -331,65 +333,56 @@ class MyMethods
 
                 Console.Write(
                     "\nAnge det konto som du vill göra en överföring från! " +
-                    "\n([quit] om du istället önskar återgå till huvudmenyn):" +
+                    "\n(skriv [quit] om du vill avbryta och återgå till huvudmenyn)" +
                     "\nKonto från: ");
                 choiceFrom = Console.ReadLine().ToUpper();
 
-                if (choiceFrom != "QUIT")
+                if (choiceFrom == "QUIT")
                 {
-                    //The ValidAccounts compare the input choiceFrom to all the account names. Returns index of account
-                    //(dimension 0 for bankaccounts) or -1 if there is no match.
-                    accountIndexFrom = ValidAccount(accountNames, customerIndex, choiceFrom);
+                    //if user enters "quit" the loop breaks
+                    quit = true; 
+                    break; 
+                }
+                //The ValidAccounts compare the input choiceFrom to all the account names. Returns index of account
+                //(dimension 0 for bankaccounts) or -1 if there is no match.
+                accountIndexFrom = ValidAccount(accountNames, customerIndex, choiceFrom);
 
-                    if (accountIndexFrom != -1)
-                    {
-                        correctAccountFrom = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Felaktig inmatning! Tryck enter för att försöka igen!");
-                        Console.ReadKey();
-                    }
+                if (accountIndexFrom != -1)
+                {
+                    correctAccountFrom = true;
                 }
                 else
                 {
-                    //if user enters "quit" the loop breaks
-                    break; 
+                    Console.WriteLine("Felaktig inmatning! Tryck enter för att försöka igen!");
+                    Console.ReadKey();
                 }
             }
-            //correctAccountsFrom = false at this stage, means the user entered "quit and we break the outer while-loop. 
-            if (!correctAccountFrom)
-            {
-                break;
-            }
 
-            while (!correctAccountTo)
+            while (!correctAccountTo && !quit)
             {
                 Console.Write("\nAnge det konto som du vill göra en överföring till! " +
-                              "\n([quit] om du istället önskar återgå " +
-                              "till huvudmenyn):" +
+                              "\n(skriv [quit] om du vill avbryta och återgå till huvudmenyn)" +
                               "\nKonto till: ");
                 choiceTo = Console.ReadLine().ToUpper();
 
-                if (choiceTo != "QUIT")
+                if (choiceTo == "QUIT")
                 {
-                    //same procedure as for accountsFrom
-                    accountIndexTo = ValidAccount(accountNames, customerIndex, choiceTo);
+                    //when quit is entered, we break the loop. 
+                    quit = true; 
+                    break;
+                }
 
-                    if (accountIndexTo != -1)
-                    {
-                        correctAccountTo = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine("\nFelaktig inmatning! Tryck enter för att försöka igen!");
-                        Console.ReadKey();
-                    }
+                //same procedure as for accountsFrom
+                accountIndexTo = ValidAccount(accountNames, customerIndex, choiceTo);
+
+                if (accountIndexTo != -1)
+                {
+                    correctAccountTo = true;
                 }
                 else
                 {
-                    //when quit is entered, we break the loop. 
-                    break; 
+                    Console.WriteLine("\nFelaktig inmatning! Tryck enter för att försöka igen!");
+                    Console.ReadKey();
                 }
             }
 
@@ -417,15 +410,14 @@ class MyMethods
                 }
                 else
                 {
+                    //since the user realise he/she has entered wrong accounts on either - correctAccountsTo/From
+                    //is changed again to false and the user gets to try again. 
+                    correctAccountFrom = false;
+                    correctAccountTo = false; 
                     Console.WriteLine("\nTryck enter för att försöka igen!");
                     Console.ReadKey();
                     Console.Clear();
                 }
-            }
-            else
-            {
-                //happens if we've chosen quit at some point. 
-                break; 
             }
         }
 
@@ -488,20 +480,29 @@ class MyMethods
     {
         decimal amountToHandle = 0;
     
-        bool correctAmount = false;
+        bool askForAmountLoop = true;
         
         //run a loop until a valid amount to transfer or withraw from account has been entered by the user. 
-        while (!correctAmount)
+        while (askForAmountLoop)
         {
             bool amountWithinBalance = false;
             bool answerCheck = false;
             
             //this while loop will run as long as the TryParse-method of the answers returns false (input not numbers)
             //or the amount is less than 0 or larger then the balance of the account. 
-            while (!answerCheck || !amountWithinBalance)
+            while (/*!answerCheck || */!amountWithinBalance)
             {
-                Console.Write($"Ange hur mycket du vill {action}: ");
-                answerCheck = Decimal.TryParse(Console.ReadLine(), out amountToHandle);
+                Console.Write($"Ange hur mycket du vill {action}!" +
+                              $"\n(skriv [quit] om du vill avbryta och återgå till huvudmenyn)" +
+                              $"\n\nSumma att {action}: ");
+                string answerString = Console.ReadLine();
+
+                if (answerString.ToLower() == "quit")
+                {
+                    return -1; 
+                }
+                
+                answerCheck = Decimal.TryParse(answerString, out amountToHandle);
     
                 if (amountToHandle <= bankAccounts[customerIndex][accountIndexFrom, 1] &&
                     amountToHandle > 0)
@@ -513,8 +514,7 @@ class MyMethods
                     Console.Clear();
                     Console.WriteLine($"Nuvarande saldo på <" +
                                       $"{accountNames[customerIndex][accountIndexFrom]}> är " +
-                                      $"{bankAccounts[customerIndex][accountIndexFrom, 1].ToString(
-                                          "C3", CultureInfo.CurrentCulture)}" +
+                                      $"{bankAccounts[customerIndex][accountIndexFrom, 1]:C}" +
                                       $"\n\nDen summa du anger måste vara över 0 och kan inte överstiga nuvarande " +
                                       $"saldo.");
                     Console.WriteLine("\nTryck enter för att försöka igen!\n");
@@ -526,14 +526,13 @@ class MyMethods
                     Console.ReadKey();
                 }
             }
-    
-            Console.WriteLine($"\nDu har angett  {amountToHandle.ToString("C3", CultureInfo.CurrentCulture)}");
-            Console.Write("\nStämmer detta? [ja/nej] ");
+            
+            Console.Write($"\nDu har angett  {amountToHandle:C}      Stämmer detta? [ja/nej]: ");
             string answer = Console.ReadLine().ToLower();
     
             if (answer == "ja")
             {
-                correctAmount = true;
+                askForAmountLoop = false;
             }
             else if (answer == "nej")
             {
@@ -585,9 +584,9 @@ class MyMethods
             
             if (accountIndexFrom != -1)
             {
-                Console.Write($"Du har angett att du vill göra ett uttag från " +
+                Console.Write($"\nDu har angett att du vill göra ett uttag från " +
                               $"{accountNames[customerIndex][accountIndexFrom]}" +
-                              $"\nStämmer det [ja/nej]?");
+                              $"\nStämmer det [ja/nej]?: ");
                 if (Console.ReadLine().ToLower() == "ja")
                 {
                     correctAccountFrom = true; 
@@ -606,14 +605,13 @@ class MyMethods
 
         if (correctAccountFrom)
         {
+            Console.WriteLine();
             decimal amountToWithraw = AmountToHandle(bankAccounts, customerIndex, accountNames, accountIndexFrom,
                 "ta ut");
 
-            Console.WriteLine(
-                "För att få göra uttag behöver du ange godkänd pinkkod. Tryck valfri tangent för att ange " +
-                "pinkod\n");
-            Console.ReadKey();
             Console.Clear();
+            Console.WriteLine(
+                "För att få göra uttag behöver vi bekräfta din identitet!\n");
 
             bool runPinLoop = true;
             bool correctpin = false;
@@ -633,8 +631,7 @@ class MyMethods
                     Console.Clear();
                     Console.WriteLine($"Uttaget lyckades! " +
                                       $"\n{choiceFrom}    Nytt saldo: " +
-                                      $"{bankAccounts[customerIndex][accountIndexFrom, 1].ToString("C3",
-                                          CultureInfo.CurrentCulture)})");
+                                      $"{bankAccounts[customerIndex][accountIndexFrom, 1]:C})");
                 }
                 else
                 {
